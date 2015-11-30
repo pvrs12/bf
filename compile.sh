@@ -1,3 +1,3 @@
 #!/bin/sh
 
-g++ -obf -Wall main.cpp
+gcc -obf -Wall main.c
