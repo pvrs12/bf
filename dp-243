@@ -1,0 +1,90 @@
+=======read in number and double it
+,     input
+> ++  loops
+[
+ -<  decrement loops and move to input
+ [
+  ->>+>+<<< add input to two other spaces
+ ]
+ >>[-<<+>>] move first copy space back to input space
+ < move back to loops
+]
+=======double is now in far right cell 3 & pointer @ 1
+
+
+=======find factors and sum them
+<  pointer @ 0
+
+[
+ ->>>>+>+<<<<< copy input to right
+]
+>>>>
+[
+ -<<<<+>>>>    restore original input
+]
+>
+=======input in cell 0 and 5 & pointer @ 5
+=======copy input (min) 1 to cell 7 and 11 and 12     0 to cell 6
+[
+ ->+>+>>>>+>+<<<<< <<
+]
+>>-
+>>>>-
+>-
+<
+<<<<
+<
+[
+ -<+>
+]
+<
+=======pointer at cell 5
+>>>>>>> move to 12
+[ ====== loop through each number less than input and sum if a factor
+ <<<<<<< move to 5
+=======calculate divmod
+[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<]
+=======pointer at cell 5
+>>>  move to 8 (n%d)
+.
+[    if n%d != 0
+     we dont want to do anything here
+ <<[-]>>[-]
+     6 = 0
+     8 = 0
+]
+<<
+pointer @ 6
+if n % d != 0 (6==0)
+if n %d == 0 (6==n)
+[ if n %d == 0 (pointer @ 6)
+ >>>>> pointer @ 11
+ .
+ [   add d to sum in cell 13
+  -  add cell 11 (d) to cell 13
+  >>+
+  <<
+ ]
+ <<<<< move to 6
+ [-]
+]
+pointer @ 6
+>
+=======pointer at cell 6
+>>>>>> move to 12
+-
+]
+=======input*2 in 3
+=======sum of factors in 13
+=======input in 0
+=======pointer @ 12
+<<<<<<<<<
+[
+ ->>>>>>>>>>>+<<<<<<<<<<< copy double to 14
+]
+>>>>>>>>>> pointer @ 13
+.
+
+
+
+
