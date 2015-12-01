@@ -15,6 +15,7 @@ void print_help(){
 	printf("OPTIONS\n");
 	printf("\tf<file>\t--file <file>\tSpecify the file to load the program from\n");
 	printf("\tn\t--number\tSpecify that numbers should be used for I/O (instead of chars)\n");
+	printf("\th\t--help\t\tShow this help message\n");
 	printf("\n");
 	exit(1);
 }
@@ -59,13 +60,13 @@ void load_program(struct string_len* str){
 	}
 }
 
-int find_right(int start, char* tape, const int tape_len){
-	int i,count=0;
-	for(i=start;i<tape_len;++i){
-		if(tape[i]=='['){
+int find_right(int start,struct string_len* program){
+	int i,count=-1;
+	for(i=start;i<program->len;++i){
+		if(program->string[i]=='['){
 			count++;
 		}
-		if(tape[i]==']'){
+		if(program->string[i]==']'){
 			if(count==0){
 				return i;
 			}
@@ -76,13 +77,13 @@ int find_right(int start, char* tape, const int tape_len){
 	return -1;
 }
 
-int find_left(int start, char* tape, const int tape_len){
-	int i,count=0;
+int find_left(int start, struct string_len* program){
+	int i,count=-1;
 	for(i=start;i>=0;--i){
-		if(tape[i]==']'){
+		if(program->string[i]==']'){
 			count++;
 		}
-		if(tape[i]=='['){
+		if(program->string[i]=='['){
 			if(count==0){
 				return i;
 			}
@@ -93,35 +94,66 @@ int find_left(int start, char* tape, const int tape_len){
 	return -1;
 }
 
-char get_input(){
-	char input;
+unsigned long get_input(){
+	unsigned long input;
 	if(number_set){
-		int iinput;
-		scanf("%d",&iinput);
-		input=iinput;
+		scanf("%lu",&input);
 	} else {
-		scanf("%c",&input);
+		char cinput;
+		scanf("%c",&cinput);
+		input=cinput;
 	}
 	return input;
 }
 
-void put_output(char out){
+void put_output(unsigned long out){
 	if(number_set){
-		printf("%d\n",out);
+		printf("%lu\n",out);
 	} else {
-		printf("%c",out);
+		printf("%c",(char)(out%256));
 	}
 }
 
-void run_program(struct string_len* program, char* tape, const int tape_len){
-	int pointer,i,ignore=0;
-	for(i=0;i<tape_len;++i){
-		tape[i]=0;
-	}
+
+void clean_program(struct string_len* program){
+	int i,ignore=0;
 	for(i=0;i<program->len;++i){
 		if(ignore && program->string[i]!='\n'){
 			continue;
 		}
+		switch(program->string[i]){
+			case('+'):
+			case('-'):
+			case('<'):
+			case('>'):
+			case('['):
+			case(']'):
+			case(','):
+			case('.'):
+				//keep these characters
+				break;
+			case('\''):
+				ignore=1;
+				program->string[i]=' ';
+				break;
+			case('\n'):
+				ignore=0;
+				program->string[i]=' ';
+				break;
+			default:
+				//remove character
+				program->string[i]=' ';
+		}	
+	}
+}
+
+void run_program(struct string_len* program, unsigned long* tape, const int tape_len){
+	int pointer,i;
+	for(i=0;i<tape_len;++i){
+		tape[i]=0;
+	}
+	clean_program(program);
+	for(i=0;i<program->len;++i){
 		switch(program->string[i]){
 			case('+'):
 				tape[pointer]++;
@@ -137,12 +169,20 @@ void run_program(struct string_len* program, char* tape, const int tape_len){
 				break;
 			case('['):
 				if(tape[pointer]==0){
-					i=find_right(i,tape,tape_len);
+					i=find_right(i,program);
+					if(i==-1){
+						fprintf(stderr,"Invalid program, no match for brace\n");
+						exit(1);
+					}
 				}
 				break;
 			case(']'):
 				if(tape[pointer]!=0){
-					i=find_left(i,tape,tape_len);
+					i=find_left(i,program);
+					if(i==-1){
+						fprintf(stderr,"Invalid program, no match for brace\n");
+						exit(1);
+					}
 				}
 				break;
 			case(','):
@@ -150,13 +190,6 @@ void run_program(struct string_len* program, char* tape, const int tape_len){
 				break;
 			case('.'):
 				put_output(tape[pointer]);
-				break;
-			case('\'')://' starts a line comment
-				//ignore everything till newline
-				ignore=1;
-				break;	
-			case('\n'):
-				ignore=0;
 				break;
 			default:
 				break;
@@ -234,9 +267,8 @@ int main(int argc, char* const argv[]){
 	}
 
 	const int TAPE_LEN=256;
-	char tape[TAPE_LEN];
+	unsigned long tape[TAPE_LEN];
 	run_program(&program,tape,TAPE_LEN);
 
-	free(file_name);
 	return 0;
 }
