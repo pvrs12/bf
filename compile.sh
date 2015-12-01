@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gcc -obf -Wall main.c
+gcc -g -obf -Wall main.c
